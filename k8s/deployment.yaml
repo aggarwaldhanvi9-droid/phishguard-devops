@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: phishguard-deployment
+  labels:
+    app: phishguard
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: phishguard
+  template:
+    metadata:
+      labels:
+        app: phishguard
+    spec:
+      containers:
+        - name: phishguard-container
+          image: phishguard-api:v1.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 5

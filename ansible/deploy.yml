@@ -1,0 +1,30 @@
+---
+- name: Automate PhishGuard Build, Containerization, and K8s Deployment
+  hosts: local
+  vars:
+    image_name: phishguard-api
+    image_tag: v1.0
+    app_dir: "{{ playbook_dir }}/.."
+
+  tasks:
+    - name: Run automated pytest suite before packaging
+      command: pytest -v
+      args:
+        chdir: "{{ app_dir }}"
+
+    - name: Build Docker container image
+      command: docker build -t {{ image_name }}:{{ image_tag }} .
+      args:
+        chdir: "{{ app_dir }}"
+
+    - name: Load image into local Kubernetes cluster (kind)
+      command: kind load docker-image {{ image_name }}:{{ image_tag }} --name phishguard-cluster
+      ignore_errors: yes
+
+    - name: Apply Kubernetes Deployment and Service manifests
+      command: kubectl apply -f k8s/
+      args:
+        chdir: "{{ app_dir }}"
+
+    - name: Wait for PhishGuard rollout to complete
+      command: kubectl rollout status deployment/phishguard-deployment --timeout=90s
