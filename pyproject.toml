@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "phishguard-api"
+version = "1.0.0"
+description = "ML-based Phishing URL Detection REST API"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "scikit-learn",
+    "joblib"
+]
+
+[tool.setuptools.packages.find]
+include = ["app*", "model*"]
+
+[tool.setuptools.package-data]
+model = ["model.joblib", "metrics.json"]
